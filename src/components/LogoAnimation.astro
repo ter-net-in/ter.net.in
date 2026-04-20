@@ -1,0 +1,99 @@
+---
+interface Props {
+  instanceId?: string;
+  scrollDriven?: boolean;
+}
+
+const { instanceId = 'default', scrollDriven = false } = Astro.props;
+
+const wrapId = `logo-wrap-${instanceId}`;
+const svgId  = `logo-svg-${instanceId}`;
+const ringId = `ring-${instanceId}`;
+---
+
+<!--
+  Props are passed via data attributes so the module script can read them
+  without needing define:vars (which disallows ES module imports).
+-->
+<div
+  class="logo-wrap"
+  id={wrapId}
+  data-svg-id={svgId}
+  data-scroll-driven={scrollDriven ? 'true' : 'false'}
+>
+  <svg
+    id={svgId}
+    viewBox="0 0 200 200"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-label="ter.net.in"
+    role="img"
+  >
+    <defs>
+      <path id={ringId} d="M 100,46 a 54,54 0 1,1 -0.001,0" />
+    </defs>
+
+    <text
+      font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+      font-size="19"
+      font-weight="700"
+      fill="#000"
+    >
+      <textPath href={`#${ringId}`} startOffset="16%" text-anchor="middle">ter.</textPath>
+    </text>
+    <text
+      font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+      font-size="19"
+      font-weight="700"
+      fill="#000"
+    >
+      <textPath href={`#${ringId}`} startOffset="49%" text-anchor="middle">net.</textPath>
+    </text>
+    <text
+      font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+      font-size="19"
+      font-weight="700"
+      fill="#000"
+    >
+      <textPath href={`#${ringId}`} startOffset="82%" text-anchor="middle">in</textPath>
+    </text>
+  </svg>
+</div>
+
+<script>
+  import { animate } from 'motion';
+
+  document.querySelectorAll<HTMLElement>('.logo-wrap').forEach((wrap) => {
+    const svgId       = wrap.dataset.svgId as string;
+    const scrollDriven = wrap.dataset.scrollDriven === 'true';
+    const svg         = document.getElementById(svgId) as HTMLElement;
+
+    animate(
+      wrap,
+      { opacity: [0, 1], scale: [0.88, 1] },
+      { duration: 1.2, delay: 0.3, easing: [0.16, 1, 0.3, 1] }
+    );
+
+    if (!scrollDriven) {
+      animate(
+        svg,
+        { rotate: [0, 360] },
+        { duration: 32, repeat: Infinity, easing: 'linear' }
+      );
+    }
+  });
+</script>
+
+<style>
+  .logo-wrap {
+    width: 100%;
+    aspect-ratio: 1;
+    opacity: 0;
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    transform-origin: center center;
+  }
+</style>

@@ -1,0 +1,19 @@
+{
+  "name": "ter-net-in",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "packageManager": "bun@1.2.0",
+  "dependencies": {
+    "@astrojs/node": "^10.0.5",
+    "astro": "^4.16.0",
+    "motion": "^11.11.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

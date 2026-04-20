@@ -1,0 +1,159 @@
+---
+// Animated wordplay heading: alternates between "ter.net.in" (domain)
+// and "inter.net." (internet).
+//
+// in-a is position:absolute so it never takes up flow space.
+// State A (domain):   in-a off-left, word-core+in-b flush left → "ter.net.in"
+// State B (internet): in-a at x=0,   word-core+in-b shifted right → "inter.net."
+//
+// On A→B: in-a slides in from left while word-core+in-b slide right together.
+// On B→A: in-a slides out left while word-core+in-b slide back to x=0.
+---
+
+<header class="site-header">
+  <div class="wordplay" id="wordplay" aria-label="ter.net.in">
+    <span id="in-a" class="part">in</span><!--
+ --><span id="word-core" class="part">ter.net.</span><!--
+ --><span id="in-b" class="part">in</span>
+  </div>
+
+  <p class="subheader" id="subheader">
+    A place on the internet, for people who love the internet.
+  </p>
+  <p class="established" id="established">Established 4/20, 2026</p>
+</header>
+
+<script>
+  import { animate } from 'motion';
+
+  const inA      = document.getElementById('in-a')      as HTMLElement;
+  const wordCore = document.getElementById('word-core') as HTMLElement;
+  const inB      = document.getElementById('in-b')      as HTMLElement;
+
+  const EASE_IN  = [0.4, 0, 1, 1]  as const;
+  const EASE_OUT = [0, 0, 0.2, 1]  as const;
+  const DUR      = 1.5;
+  const PAUSE_MS = 6500;
+
+  // Measure "in" width before hiding — in-a is absolute so offsetWidth
+  // reflects intrinsic text width regardless of any transform.
+  const inAWidth = inA.offsetWidth;
+
+  // Initial state: in-a hidden off-left, word-core + in-b flush left.
+  animate(inA,      { x: -inAWidth, opacity: 0 }, { duration: 0 });
+  animate(wordCore, { x: 0 },                     { duration: 0 });
+  animate(inB,      { x: 0, opacity: 1 },         { duration: 0 });
+
+  function sleep(ms: number): Promise<void> {
+    return new Promise((r) => setTimeout(r, ms));
+  }
+
+  async function toInternet(): Promise<void> {
+    await Promise.all([
+      animate(inA,      { x: [-inAWidth, 0],   opacity: [0, 1] }, { duration: DUR, easing: EASE_OUT }).finished,
+      animate(wordCore, { x: [0, inAWidth] },                      { duration: DUR, easing: EASE_OUT }).finished,
+      animate(inB,      { x: [0, inAWidth],    opacity: [1, 0] }, { duration: DUR, easing: EASE_OUT }).finished,
+    ]);
+  }
+
+  async function toDomain(): Promise<void> {
+    await Promise.all([
+      animate(inA,      { x: [0, -inAWidth],   opacity: [1, 0] }, { duration: DUR, easing: EASE_IN }).finished,
+      animate(wordCore, { x: [inAWidth, 0] },                      { duration: DUR, easing: EASE_IN }).finished,
+      animate(inB,      { x: [inAWidth, 0],    opacity: [0, 1] }, { duration: DUR, easing: EASE_IN }).finished,
+    ]);
+  }
+
+  async function runLoop(): Promise<void> {
+    await sleep(1600);
+    while (true) {
+      await toInternet();
+      await sleep(PAUSE_MS);
+      await toDomain();
+      await sleep(PAUSE_MS);
+    }
+  }
+
+  runLoop();
+
+  // Entrance animations
+  animate(
+    '#wordplay',
+    { opacity: [0, 1], y: [32, 0] },
+    { duration: 0.9, easing: [0.16, 1, 0.3, 1] }
+  );
+
+  animate(
+    '#subheader',
+    { opacity: [0, 1], y: [16, 0] },
+    { duration: 0.8, delay: 0.25, easing: [0.16, 1, 0.3, 1] }
+  );
+
+  animate(
+    '#established',
+    { opacity: [0, 1] },
+    { duration: 0.8, delay: 0.45, easing: [0.16, 1, 0.3, 1] }
+  );
+</script>
+
+<style>
+  .site-header {
+    grid-row: 1;
+    padding-top: clamp(1rem, 3vw, 2rem);
+  }
+
+  .wordplay {
+    /*
+      Flex + baseline keeps all three spans — including the absolute in-a —
+      on the same text baseline, so no vertical drift at large font sizes.
+    */
+    display: flex;
+    align-items: baseline;
+    position: relative;
+    overflow: hidden;
+    width: 80%;
+    font-size: clamp(3.2rem, 10vw, 7.5rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+    opacity: 0;
+    margin-bottom: clamp(1.2rem, 3vw, 2rem);
+  }
+
+  /* Absolute so it never creates a gap in the flow.
+     align-self: baseline keeps it on the shared baseline. */
+  #in-a {
+    position: absolute;
+    left: 0;
+    align-self: baseline;
+  }
+
+  .part {
+    display: block; /* flex children don't need inline-block */
+    flex-shrink: 0;
+  }
+
+  .subheader {
+    font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+    color: var(--gray);
+    max-width: 44ch;
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+    opacity: 0;
+  }
+
+  .established {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray);
+    opacity: 0;
+  }
+
+  @media (max-width: 600px) {
+    .wordplay {
+      width: 100%;
+      font-size: clamp(2.8rem, 14vw, 4rem);
+    }
+  }
+</style>

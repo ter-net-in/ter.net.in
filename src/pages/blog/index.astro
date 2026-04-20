@@ -1,0 +1,117 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const formatDate = (date: Date): string =>
+  date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<BaseLayout title="Blog" description="Writing from ter.net.in">
+  <div class="page-wrap">
+    <header id="blog-header">
+      <a class="back" href="/">← ter.net.in</a>
+      <h1>blog</h1>
+    </header>
+
+    <ul id="post-list">
+      {posts.map((post) => (
+        <li>
+          <a href={`/blog/${post.slug}`}>
+            <span class="post-title">{post.data.title}</span>
+            <span class="post-meta">
+              <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+              {' — '}
+              {post.data.description}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</BaseLayout>
+
+<script>
+  import { animate, stagger } from 'motion';
+
+  animate(
+    '#blog-header',
+    { opacity: [0, 1], y: [20, 0] },
+    { duration: 0.8, easing: [0.16, 1, 0.3, 1] }
+  );
+
+  animate(
+    '#post-list li',
+    { opacity: [0, 1], y: [12, 0] },
+    { duration: 0.7, delay: stagger(0.08, { start: 0.2 }), easing: [0.16, 1, 0.3, 1] }
+  );
+</script>
+
+<style>
+  .page-wrap {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: clamp(2rem, 6vw, 4rem) var(--gap);
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  header {
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .back {
+    font-size: 0.85rem;
+    color: var(--gray);
+  }
+
+  .back:hover {
+    color: var(--black);
+    text-decoration: none;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  li {
+    opacity: 0;
+  }
+
+  li a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid #e8e8e8;
+  }
+
+  li:first-child a {
+    border-top: 1px solid #e8e8e8;
+  }
+
+  .post-title {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .post-meta {
+    font-size: 0.82rem;
+    color: var(--gray);
+  }
+</style>

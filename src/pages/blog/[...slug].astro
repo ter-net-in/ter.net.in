@@ -1,0 +1,210 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import LogoAnimation from '@/components/LogoAnimation.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+const formatDate = (date: Date): string =>
+  date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<BaseLayout title={post.data.title} description={post.data.description}>
+  <div class="logo-sticky">
+    <LogoAnimation instanceId="article" scrollDriven={true} />
+  </div>
+
+  <div class="page-wrap">
+    <header id="post-header">
+      <a class="back" href="/">← ter.net.in</a>
+      <h1>{post.data.title}</h1>
+      <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+    </header>
+
+    <article id="post-body">
+      <Content />
+    </article>
+  </div>
+</BaseLayout>
+
+<script>
+  import { animate } from 'motion';
+
+  animate(
+    '#post-header',
+    { opacity: [0, 1], y: [20, 0] },
+    { duration: 0.8, easing: [0.16, 1, 0.3, 1] }
+  );
+
+  animate(
+    '#post-body',
+    { opacity: [0, 1], y: [16, 0] },
+    { duration: 0.8, delay: 0.15, easing: [0.16, 1, 0.3, 1] }
+  );
+
+  // ── Scroll-driven logo rotation ────────────────────────────────────────────
+  //
+  // Each scroll event adds to velocity (proportional to scroll delta).
+  // A rAF loop applies friction each frame so the logo coasts to a stop
+  // smoothly after the user stops scrolling.
+
+  const logoSvg = document.getElementById('logo-svg-article') as HTMLElement;
+
+  let rotation  = 0;
+  let velocity  = 0;
+  let lastY     = window.scrollY;
+  let animating = false;
+
+  const SENSITIVITY  = 0.33; // scroll px → rotation deg multiplier
+  const MAX_VELOCITY = 7;  // deg/frame cap — prevents unbounded spin
+  const FRICTION     = 0.93; // velocity retained per frame (higher = longer coast)
+  const MIN_VELOCITY = 0.05; // stop threshold
+
+  function step(): void {
+    velocity *= FRICTION;
+    rotation += velocity;
+    logoSvg.style.transform = `rotate(${rotation}deg)`;
+
+    if (Math.abs(velocity) > MIN_VELOCITY) {
+      requestAnimationFrame(step);
+    } else {
+      velocity  = 0;
+      animating = false;
+    }
+  }
+
+  window.addEventListener('scroll', () => {
+    const currentY = window.scrollY;
+    const delta    = currentY - lastY;
+    lastY          = currentY;
+
+    velocity += delta * SENSITIVITY;
+    velocity  = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, velocity));
+
+    if (!animating) {
+      animating = true;
+      requestAnimationFrame(step);
+    }
+  }, { passive: true });
+</script>
+
+<style>
+  .page-wrap {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: clamp(2rem, 6vw, 4rem) var(--gap);
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  header {
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .back {
+    font-size: 0.85rem;
+    color: var(--gray);
+    letter-spacing: 0.02em;
+  }
+
+  .back:hover {
+    color: var(--black);
+    text-decoration: none;
+  }
+
+  h1 {
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  time {
+    font-size: 0.82rem;
+    color: var(--gray);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  article {
+    opacity: 0;
+    font-size: clamp(0.95rem, 2vw, 1.05rem);
+    line-height: 1.75;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  article :global(strong) {
+    font-weight: 700;
+  }
+
+  article :global(a) {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  article :global(h2),
+  article :global(h3) {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  article :global(h2) {
+    font-size: 1.4rem;
+    margin-top: 0.5rem;
+  }
+
+  article :global(h3) {
+    font-size: 1.1rem;
+  }
+
+  article :global(ul),
+  article :global(ol) {
+    padding-left: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  article :global(code) {
+    font-family: 'Courier New', monospace;
+    font-size: 0.88em;
+    background: #f0f0f0;
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+  }
+
+  article :global(blockquote) {
+    border-left: 2px solid var(--black);
+    padding-left: 1.25rem;
+    color: var(--gray);
+  }
+
+  .logo-sticky {
+    position: fixed;
+    top: clamp(1.5rem, 3vw, 2rem);
+    right: clamp(1.5rem, 3vw, 2rem);
+    width: clamp(80px, 10vw, 130px);
+    pointer-events: none;
+    z-index: 10;
+  }
+</style>

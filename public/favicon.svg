@@ -1,0 +1,15 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#ffffff"/>
+  <defs>
+    <path id="ring" d="M 100,46 a 54,54 0 1,1 -0.001,0"/>
+  </defs>
+  <text font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#000000">
+    <textPath href="#ring" startOffset="16%" text-anchor="middle">ter.</textPath>
+  </text>
+  <text font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#000000">
+    <textPath href="#ring" startOffset="49%" text-anchor="middle">net.</textPath>
+  </text>
+  <text font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#000000">
+    <textPath href="#ring" startOffset="82%" text-anchor="middle">in</textPath>
+  </text>
+</svg>
