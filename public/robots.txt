@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ter.net.in/sitemap-index.xml
