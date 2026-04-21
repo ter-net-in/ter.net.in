@@ -9,11 +9,18 @@ import LogoAnimation from '@/components/LogoAnimation.astro';
 
     <WordplayHeader />
 
-    <!-- ── Center: blog link ── -->
-    <div class="blog-cta" id="blog-cta">
-      <a href="/blog" id="blog-link" class="blog-link">
+    <!-- ── Center: nav links ── -->
+    <div class="nav-cta" id="nav-cta">
+      <a href="/blog" id="blog-link" class="nav-link">
         <span class="label">blog</span>
-        <svg id="arrow" class="arrow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <svg id="arrow-blog" class="arrow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <line x1="4" y1="20" x2="20" y2="4" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+          <polyline points="9,4 20,4 20,15" stroke="currentColor" stroke-width="3.5" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="10" fill="none"/>
+        </svg>
+      </a>
+      <a href="/experiments" id="experiments-link" class="nav-link">
+        <span class="label">experiments</span>
+        <svg id="arrow-experiments" class="arrow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <line x1="4" y1="20" x2="20" y2="4" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
           <polyline points="9,4 20,4 20,15" stroke="currentColor" stroke-width="3.5" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="10" fill="none"/>
         </svg>
@@ -32,21 +39,20 @@ import LogoAnimation from '@/components/LogoAnimation.astro';
   import { animate } from 'motion';
 
   animate(
-    '#blog-cta',
+    '#nav-cta',
     { opacity: [0, 1], y: [12, 0] },
     { duration: 0.8, delay: 0.6, easing: [0.16, 1, 0.3, 1] }
   );
 
-  const blogLink = document.getElementById('blog-link') as HTMLElement;
-  const arrow    = document.getElementById('arrow')     as HTMLElement;
-
-  blogLink.addEventListener('mouseenter', () => {
-    animate(arrow, { x: 4, y: -4 }, { duration: 0.2, easing: 'ease-out' });
-  });
-
-  blogLink.addEventListener('mouseleave', () => {
-    animate(arrow, { x: 0, y: 0 }, { duration: 0.2, easing: 'ease-out' });
-  });
+  for (const { linkId, arrowId } of [
+    { linkId: 'blog-link', arrowId: 'arrow-blog' },
+    { linkId: 'experiments-link', arrowId: 'arrow-experiments' },
+  ]) {
+    const link  = document.getElementById(linkId)  as HTMLElement;
+    const arrow = document.getElementById(arrowId) as HTMLElement;
+    link.addEventListener('mouseenter', () => animate(arrow, { x: 4, y: -4 }, { duration: 0.2, easing: 'ease-out' }));
+    link.addEventListener('mouseleave', () => animate(arrow, { x: 0, y: 0  }, { duration: 0.2, easing: 'ease-out' }));
+  }
 </script>
 
 <style>
@@ -58,22 +64,23 @@ import LogoAnimation from '@/components/LogoAnimation.astro';
     position: relative;
   }
 
-  .blog-cta {
+  .nav-cta {
     grid-row: 2;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     align-self: center;
+    gap: 0.6rem;
     opacity: 0;
   }
 
-  .blog-link {
+  .nav-link {
     display: inline-flex;
     align-items: center;
     gap: 0.25em;
     font-size: clamp(1.1rem, 2vw, 1.4rem);
     font-weight: 800;
-    color: var(--black);
     text-decoration: none;
     letter-spacing: -0.01em;
     color: #0047ff;

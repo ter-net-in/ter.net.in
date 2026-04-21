@@ -10,4 +10,15 @@ const blog = defineCollection({
   }),
 });
 
-export const collections = { blog };
+const experiments = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/experiments' }),
+  schema: z.object({
+    name: z.string(),
+    url: z.string().url(),
+    description: z.string(),
+    image: z.string(),
+    order: z.number().default(99),
+  }),
+});
+
+export const collections = { blog, experiments };

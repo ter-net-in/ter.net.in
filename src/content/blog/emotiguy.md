@@ -1,5 +1,5 @@
 ---
-title: "We built an Emotiguy creator"
+title: "We built an Emotiguy editor"
 date: 2026-04-20
 description: "On Joe, the smug 3D sun that outlived everything it ever appeared on."
 ---
@@ -14,7 +14,7 @@ He just kept rotating.
 
 We found him again through [this video](https://www.youtube.com/watch?v=jfwt2h1icKk) — someone doing that thing where they dig through early internet artifacts with the tone of careful archaeology. *Look at this thing that existed.* And we looked, and we thought: yeah. That guy deserves something.
 
-So we built **[Emotiguy Creator](https://emotiguy.ter.net.in)**. A small browser tool where you can make your own Joe. Nothing serious. Just a thing that exists because an old 3D render from 2005 is still somehow more alive than most of what was built after it.
+So we built **[Emotiguy Editor](https://emotiguy.ter.net.in)**. A small browser tool where you can make your own Joe. Nothing serious. Just a thing that exists because an old 3D render from 2005 is still somehow more alive than most of what was built after it.
 
 The internet keeps these things if you let it.
 
