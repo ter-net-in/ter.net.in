@@ -79,27 +79,34 @@
 
 <style>
   #cursor-bubble {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 12px;
-    height: 12px;
-    background: rgba(0, 0, 0, 0.7);
-    border: 1.5px solid transparent;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    will-change: transform;
-    transition: opacity 0.2s;
+    display: none;
   }
 
-  :global(body) {
-    cursor: none;
-  }
+  @media (pointer: fine) {
+    #cursor-bubble {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 12px;
+      height: 12px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1.5px solid transparent;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      will-change: transform;
+      transition: opacity 0.2s;
+    }
 
-  :global(a),
-  :global(button),
-  :global([role="button"]) {
-    cursor: none;
+    :global(body) {
+      cursor: none;
+    }
+
+    :global(a),
+    :global(button),
+    :global([role="button"]) {
+      cursor: none;
+    }
   }
 </style>
