@@ -1,0 +1,105 @@
+<div id="cursor-bubble"></div>
+
+<script>
+  import { animate } from 'motion';
+
+  const isTouchDevice = () => window.matchMedia('(pointer: coarse)').matches;
+  if (isTouchDevice()) {
+    document.documentElement.style.removeProperty('cursor');
+  } else {
+    const bubble = document.getElementById('cursor-bubble') as HTMLElement;
+    let mouseX = -100;
+    let mouseY = -100;
+    let bubbleX = -100;
+    let bubbleY = -100;
+    let prevBubbleX = -100;
+    let prevBubbleY = -100;
+    let stretch = 1;
+    let rafId: number;
+    let isHovering = false;
+
+    const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
+    const clamp = (v: number, min: number, max: number): number => Math.min(Math.max(v, min), max);
+
+    function loop(): void {
+      prevBubbleX = bubbleX;
+      prevBubbleY = bubbleY;
+      bubbleX = lerp(bubbleX, mouseX, 0.12);
+      bubbleY = lerp(bubbleY, mouseY, 0.12);
+
+      const dx = bubbleX - prevBubbleX;
+      const dy = bubbleY - prevBubbleY;
+      const speed = Math.sqrt(dx * dx + dy * dy);
+
+      const targetStretch = clamp(1 + speed * 0.06, 1, 1.6);
+      stretch = lerp(stretch, targetStretch, 0.2);
+
+      const angle = speed > 0.5 ? Math.atan2(dy, dx) * (180 / Math.PI) : 0;
+      const scaleX = stretch;
+      const scaleY = clamp(1 / stretch, 0.4, 1);
+
+      bubble.style.transform = `translate(calc(${bubbleX}px - 50%), calc(${bubbleY}px - 50%)) rotate(${angle}deg) scale(${scaleX}, ${scaleY})`;
+
+      rafId = requestAnimationFrame(loop);
+    }
+
+    loop();
+
+    document.addEventListener('mousemove', (e: MouseEvent) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    document.addEventListener('mouseleave', () => {
+      bubble.style.opacity = '0';
+    });
+
+    document.addEventListener('mouseenter', () => {
+      bubble.style.opacity = '1';
+    });
+
+    function setHover(active: boolean): void {
+      if (active === isHovering) return;
+      isHovering = active;
+      animate(
+        bubble,
+        active
+          ? { width: '48px', height: '48px', background: 'rgba(0,71,255,0.12)', border: '1.5px solid rgba(0,71,255,0.5)' }
+          : { width: '12px', height: '12px', background: 'rgba(0,0,0,0.7)', border: '1.5px solid transparent' },
+        { duration: 0.25, easing: [0.16, 1, 0.3, 1] }
+      );
+    }
+
+    document.addEventListener('mouseover', (e: MouseEvent) => {
+      const target = e.target as Element;
+      setHover(!!target.closest('a, button, [role="button"]'));
+    });
+  }
+</script>
+
+<style>
+  #cursor-bubble {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1.5px solid transparent;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    will-change: transform;
+    transition: opacity 0.2s;
+  }
+
+  :global(body) {
+    cursor: none;
+  }
+
+  :global(a),
+  :global(button),
+  :global([role="button"]) {
+    cursor: none;
+  }
+</style>

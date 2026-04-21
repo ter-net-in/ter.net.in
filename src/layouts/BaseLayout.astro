@@ -1,4 +1,6 @@
 ---
+import CursorBubble from '@/components/CursorBubble.astro';
+
 interface Props {
   title?: string;
   description?: string;
@@ -23,6 +25,7 @@ const {
     <script defer src="https://stats.ter.net.in/script.js" data-website-id="3b074fea-fbe2-42d4-bed5-e9352a1d4eb8"></script>
   </head>
   <body>
+    <CursorBubble />
     <slot />
   </body>
 </html>

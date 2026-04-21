@@ -10,6 +10,7 @@ import LogoAnimation from '@/components/LogoAnimation.astro';
     <WordplayHeader />
 
     <!-- ── Center: nav links ── -->
+    <div class="nav-anchor">
     <div class="nav-cta" id="nav-cta">
       <a href="/blog" id="blog-link" class="nav-link">
         <span class="label">blog</span>
@@ -25,6 +26,12 @@ import LogoAnimation from '@/components/LogoAnimation.astro';
           <polyline points="9,4 20,4 20,15" stroke="currentColor" stroke-width="3.5" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="10" fill="none"/>
         </svg>
       </a>
+    </div>
+    </div>
+
+    <!-- ── Grid overlay ── -->
+    <div class="grid-overlay" aria-hidden="true">
+      {Array.from({ length: 5 * 5 }).map((_, i) => <div class="grid-cell" />)}
     </div>
 
     <!-- ── Bottom-right: rotating logo ── -->
@@ -64,13 +71,17 @@ import LogoAnimation from '@/components/LogoAnimation.astro';
     position: relative;
   }
 
+  .nav-anchor {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
   .nav-cta {
-    grid-row: 2;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    align-self: center;
     gap: 0.6rem;
     opacity: 0;
   }
@@ -95,10 +106,39 @@ import LogoAnimation from '@/components/LogoAnimation.astro';
     flex-shrink: 0;
   }
 
+  @media (min-width: 768px) {
+    .grid-overlay {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: clamp(2rem, 5vw, 3.5rem) 1fr 1fr 1fr clamp(2rem, 5vw, 3.5rem);
+      grid-template-rows: clamp(2rem, 5vw, 3.5rem) 1fr 1fr 1fr clamp(2rem, 5vw, 3.5rem);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .grid-cell {
+      border-right: 1px solid rgba(0,0,0,0.04);
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+
+    /* No border on last column or last row */
+    .grid-cell:nth-child(5n)   { border-right: none; }
+    .grid-cell:nth-child(n+21) { border-bottom: none; }
+
+    /* Content boundary — right edge of gutter col & left edge of gutter col */
+    .grid-cell:nth-child(5n+1) { border-right-color: rgba(0,0,0,0.10); }
+    .grid-cell:nth-child(5n+4) { border-right-color: rgba(0,0,0,0.10); }
+
+    /* Content boundary — bottom edge of top gutter & top edge of bottom gutter */
+    .grid-cell:nth-child(-n+5)           { border-bottom-color: rgba(0,0,0,0.10); }
+    .grid-cell:nth-child(n+16):nth-child(-n+20) { border-bottom-color: rgba(0,0,0,0.10); }
+  }
+
   .logo-corner {
     position: fixed;
-    bottom: clamp(1.5rem, 3vw, 2.5rem);
-    right: clamp(1.5rem, 3vw, 2.5rem);
+    bottom: clamp(2rem, 5vw, 3.5rem);
+    right: clamp(2rem, 5vw, 3.5rem);
     width: clamp(90px, 11vw, 148px);
     pointer-events: none;
   }
