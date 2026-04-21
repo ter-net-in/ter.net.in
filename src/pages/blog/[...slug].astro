@@ -199,6 +199,12 @@ const formatDate = (date: Date): string =>
     color: var(--gray);
   }
 
+  article :global(img) {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
   .logo-sticky {
     position: fixed;
     top: clamp(1.5rem, 3vw, 2rem);
