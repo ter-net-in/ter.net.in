@@ -3,11 +3,12 @@
 <script>
   import { animate } from 'motion';
 
+  const bubble = document.getElementById('cursor-bubble') as HTMLElement;
+
   const isTouchDevice = () => window.matchMedia('(pointer: coarse)').matches;
   if (isTouchDevice()) {
-    document.documentElement.style.removeProperty('cursor');
+    bubble.style.display = 'none';
   } else {
-    const bubble = document.getElementById('cursor-bubble') as HTMLElement;
     let mouseX = -100;
     let mouseY = -100;
     let bubbleX = -100;
