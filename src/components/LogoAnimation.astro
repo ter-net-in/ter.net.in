@@ -1,13 +1,13 @@
 ---
 interface Props {
-  instanceId?: string;
-  scrollDriven?: boolean;
+	instanceId?: string;
+	scrollDriven?: boolean;
 }
 
-const { instanceId = 'default', scrollDriven = false } = Astro.props;
+const { instanceId = "default", scrollDriven = false } = Astro.props;
 
 const wrapId = `logo-wrap-${instanceId}`;
-const svgId  = `logo-svg-${instanceId}`;
+const svgId = `logo-svg-${instanceId}`;
 const ringId = `ring-${instanceId}`;
 ---
 
