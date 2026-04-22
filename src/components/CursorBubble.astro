@@ -1,23 +1,50 @@
-<div id="cursor-bubble"></div>
+<div id="cursor-bubble">
+  <svg id="cursor-ring" viewBox="0 0 44 44" aria-hidden="true">
+    <circle cx="22" cy="22" r="20" />
+  </svg>
+</div>
 
 <script>
   import { animate } from 'motion';
 
   const bubble = document.getElementById('cursor-bubble') as HTMLElement;
 
+  const STORAGE_KEY = 'cursor-pos';
+
+  const loadPosition = (): { x: number; y: number } | null => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const savePosition = (x: number, y: number): void => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ x, y }));
+    } catch {
+      // storage unavailable — fail silently
+    }
+  };
+
   const isTouchDevice = () => window.matchMedia('(pointer: coarse)').matches;
   if (isTouchDevice()) {
     bubble.style.display = 'none';
   } else {
-    let mouseX = -100;
-    let mouseY = -100;
-    let bubbleX = -100;
-    let bubbleY = -100;
-    let prevBubbleX = -100;
-    let prevBubbleY = -100;
+    const saved = loadPosition();
+    let mouseX = saved?.x ?? -100;
+    let mouseY = saved?.y ?? -100;
+    let bubbleX = saved?.x ?? -100;
+    let bubbleY = saved?.y ?? -100;
+    let prevBubbleX = bubbleX;
+    let prevBubbleY = bubbleY;
     let stretch = 1;
     let rafId: number;
-    let isHovering = false;
+    let isLightboxOpen = false;
+
+    type CursorState = 'default' | 'link' | 'image' | 'close';
+    let currentState: CursorState = 'default';
 
     const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
     const clamp = (v: number, min: number, max: number): number => Math.min(Math.max(v, min), max);
@@ -49,6 +76,7 @@
     document.addEventListener('mousemove', (e: MouseEvent) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
+      savePosition(mouseX, mouseY);
     });
 
     document.addEventListener('mouseleave', () => {
@@ -59,21 +87,42 @@
       bubble.style.opacity = '1';
     });
 
-    function setHover(active: boolean): void {
-      if (active === isHovering) return;
-      isHovering = active;
-      animate(
-        bubble,
-        active
-          ? { width: '48px', height: '48px', background: 'rgba(0,71,255,0.12)', border: '1.5px solid rgba(0,71,255,0.5)' }
-          : { width: '12px', height: '12px', background: 'rgba(0,0,0,0.7)', border: '1.5px solid transparent' },
-        { duration: 0.25, easing: [0.16, 1, 0.3, 1] }
-      );
+    const STATES: Record<CursorState, Record<string, string>> = {
+      default: { width: '12px', height: '12px', background: 'rgba(0,0,0,0.7)',      border: '1.5px solid transparent' },
+      link:    { width: '48px', height: '48px', background: 'rgba(0,71,255,0.12)',   border: '1.5px solid rgba(0,71,255,0.5)' },
+      image:   { width: '40px', height: '40px', background: 'rgba(0,0,0,0.0)',       border: '1.5px solid transparent' },
+      close:   { width: '40px', height: '40px', background: 'rgba(255,255,255,0.1)', border: '1.5px solid rgba(255,255,255,0.45)' },
+    };
+
+    function setState(next: CursorState): void {
+      if (next === currentState) return;
+      currentState = next;
+      bubble.classList.toggle('is-image', next === 'image');
+      animate(bubble, STATES[next], { duration: 0.25, easing: [0.16, 1, 0.3, 1] });
     }
+
+    document.addEventListener('lightbox:open', () => {
+      isLightboxOpen = true;
+      const dialog = document.getElementById('lightbox');
+      if (dialog) dialog.appendChild(bubble);
+    });
+
+    document.addEventListener('lightbox:close', () => {
+      isLightboxOpen = false;
+      setState('default');
+      document.body.appendChild(bubble);
+    });
 
     document.addEventListener('mouseover', (e: MouseEvent) => {
       const target = e.target as Element;
-      setHover(!!target.closest('a, button, [role="button"]'));
+      const isZoomable = !!target.closest('[data-zoomable]');
+      const isInteractive = !!target.closest('a, button, [role="button"]');
+      const isBackdrop = isLightboxOpen && e.target === document.getElementById('lightbox');
+
+      if (isZoomable && !isLightboxOpen) setState('image');
+      else if (isBackdrop) setState('close');
+      else if (isInteractive) setState('link');
+      else setState(isLightboxOpen ? 'close' : 'default');
     });
   }
 </script>
@@ -100,13 +149,47 @@
       transition: opacity 0.2s;
     }
 
+    #cursor-ring {
+      position: absolute;
+      inset: -2px;
+      width: calc(100% + 4px);
+      height: calc(100% + 4px);
+      overflow: visible;
+      opacity: 0;
+      transition: opacity 0.25s;
+      pointer-events: none;
+    }
+
+    #cursor-ring circle {
+      fill: none;
+      stroke: transparent;
+      stroke-width: 1.5;
+      stroke-dasharray: 3 11;
+      stroke-linecap: round;
+    }
+
+    #cursor-bubble.is-image #cursor-ring {
+      opacity: 1;
+      animation: ring-spin 7s linear infinite;
+    }
+
+    #cursor-bubble.is-image #cursor-ring circle {
+      stroke: rgba(0, 0, 0, 0.6);
+    }
+
+    @keyframes ring-spin {
+      to { transform: rotate(360deg); }
+    }
+
     :global(body) {
       cursor: none;
     }
 
     :global(a),
     :global(button),
-    :global([role="button"]) {
+    :global([role="button"]),
+    :global([data-zoomable]),
+    :global(#lightbox) {
       cursor: none;
     }
   }

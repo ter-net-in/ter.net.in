@@ -1,0 +1,126 @@
+<dialog id="lightbox" aria-label="Image viewer">
+  <button id="lightbox-close" aria-label="Close">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <line x1="1" y1="1" x2="15" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="15" y1="1" x2="1" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <img id="lightbox-img" src="" alt="" />
+</dialog>
+
+<script>
+  import { animate } from 'motion';
+
+  const isDesktop = () => window.matchMedia('(pointer: fine)').matches;
+  if (!isDesktop()) {
+    // nothing to do on touch devices
+  } else {
+    const dialog = document.getElementById('lightbox') as HTMLDialogElement;
+    const img = document.getElementById('lightbox-img') as HTMLImageElement;
+    const closeBtn = document.getElementById('lightbox-close') as HTMLButtonElement;
+
+    function openLightbox(src: string, alt: string): void {
+      img.src = src;
+      img.alt = alt;
+      dialog.showModal();
+      animate(img, { opacity: [0, 1], scale: [0.92, 1] }, { duration: 0.22, easing: [0.16, 1, 0.3, 1] });
+      document.dispatchEvent(new CustomEvent('lightbox:open'));
+    }
+
+    function closeLightbox(): void {
+      animate(img, { opacity: [1, 0], scale: [1, 0.92] }, { duration: 0.18, easing: 'ease-in' }).finished.then(() => {
+        dialog.close();
+        img.src = '';
+      });
+      document.dispatchEvent(new CustomEvent('lightbox:close'));
+    }
+
+    function makeZoomable(el: HTMLImageElement): void {
+      el.setAttribute('data-zoomable', '');
+      el.addEventListener('click', (e: MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openLightbox(el.src, el.alt);
+      });
+    }
+
+    // Article images + experiment thumbnails
+    document.querySelectorAll<HTMLImageElement>('article img, .experiment-img').forEach(makeZoomable);
+
+    // Re-run for any images injected after load (e.g. dynamic content)
+    const observer = new MutationObserver(() => {
+      document.querySelectorAll<HTMLImageElement>('article img:not([data-zoomable]), .experiment-img:not([data-zoomable])').forEach(makeZoomable);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    closeBtn.addEventListener('click', closeLightbox);
+
+    dialog.addEventListener('click', (e: MouseEvent) => {
+      if (e.target === dialog) closeLightbox();
+    });
+
+    dialog.addEventListener('close', () => {
+      document.dispatchEvent(new CustomEvent('lightbox:close'));
+    });
+  }
+</script>
+
+<style>
+  #lightbox {
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    max-width: 100dvw;
+    max-height: 100dvh;
+    width: 100dvw;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  #lightbox[open] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #lightbox::backdrop {
+    background: rgba(0, 0, 0, 0.88);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  #lightbox img {
+    max-width: min(92vw, 92vh);
+    max-height: 92dvh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+    border-radius: 6px;
+  }
+
+  #lightbox-close {
+    position: fixed;
+    top: clamp(1rem, 3vw, 2rem);
+    right: clamp(1rem, 3vw, 2rem);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  #lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+</style>
