@@ -1,21 +1,15 @@
 ---
-title: "It's Over."
+title: "We rebuilt the macOS fake-update prank"
 date: 2026-05-04
-description: "Prank like a boss."
+description: "A modern macOS fake-update prank in the spirit of the sites that used to own every office keyboard."
 ---
 
-![itsover.ter.net.in](/itsover.png)
+![A glossy fake macOS software-update screen](/itsover.png)
 
-If you were around for the golden era of the internet, you probably remember fakeupdate.net — the legendary site that let you trick your coworkers, roommates, or teachers into thinking their computer was paralyzed by an endless software update.
+If you were around for the golden era of the internet, you probably remember fakeupdate.net — the site that let you trick coworkers, roommates, or teachers into thinking their machine was frozen on an endless software update.
 
-Now, the classic has been completely rebuilt for the modern era.
+We rebuilt that idea for sharper displays and pickier eyes. **[itsover.ter.net.in](https://itsover.ter.net.in)** serves pixel-tight, hyper-modern macOS software-update screens — one flavor of panic, done carefully.
 
-**[itsover.ter.net.in](https://itsover.ter.net.in)** is the sleeker, more realistic, and infinitely more chaotic successor to the original prank. It features pixel-perfect, hyper-modern update screens for Windows, macOS, and more.
+Nothing serious. Just a little timeless chaos, one fullscreen tab at a time.
 
-Go ahead. Cause a little chaos today: [itsover.ter.net.in](https://itsover.ter.net.in)
-
-It's over for them.
-
-[Go now: itsover.ter.net.in](https://itsover.ter.net.in)
-
-Enjoy the chaos.
+Go try it.
