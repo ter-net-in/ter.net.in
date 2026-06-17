@@ -189,12 +189,28 @@ const formatDate = (date: Date): string =>
     gap: 0.4rem;
   }
 
-  article :global(code) {
+  article :global(:not(pre) > code) {
     font-family: 'Courier New', monospace;
     font-size: 0.88em;
     background: #f0f0f0;
     padding: 0.1em 0.35em;
     border-radius: 3px;
+  }
+
+  article :global(pre) {
+    overflow-x: auto;
+    background: #f0f0f0;
+    padding: 1rem;
+    border-radius: 6px;
+    line-height: 1.5;
+  }
+
+  article :global(pre code) {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
   }
 
   article :global(blockquote) {
