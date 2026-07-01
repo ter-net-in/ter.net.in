@@ -17,6 +17,7 @@ const experiments = defineCollection({
 		url: z.string().url(),
 		description: z.string(),
 		image: z.string(),
+		tags: z.array(z.string()).default([]),
 		order: z.number().default(99),
 	}),
 });
