@@ -2,6 +2,10 @@
 import LogoAnimation from "@/components/LogoAnimation.astro";
 import WordplayHeader from "@/components/WordplayHeader.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
+
+const ecosystemUrl = import.meta.env.DEV && import.meta.env.PUBLIC_ECOSYSTEM_URL
+  ? import.meta.env.PUBLIC_ECOSYSTEM_URL
+  : "https://ecosystem.ter.net.in";
 ---
 
 <BaseLayout>
@@ -12,6 +16,13 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
     <!-- ── Center: nav links ── -->
     <div class="nav-anchor">
     <div class="nav-cta" id="nav-cta">
+      <a href={ecosystemUrl} id="ecosystem-link" class="nav-link">
+        <span class="label">ecosystem</span>
+        <svg id="arrow-ecosystem" class="arrow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <line x1="4" y1="20" x2="20" y2="4" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+          <polyline points="9,4 20,4 20,15" stroke="currentColor" stroke-width="3.5" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="10" fill="none"/>
+        </svg>
+      </a>
       <a href="/blog" id="blog-link" class="nav-link">
         <span class="label">blog</span>
         <svg id="arrow-blog" class="arrow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -52,6 +63,7 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
   );
 
   for (const { linkId, arrowId } of [
+    { linkId: 'ecosystem-link', arrowId: 'arrow-ecosystem' },
     { linkId: 'blog-link', arrowId: 'arrow-blog' },
     { linkId: 'experiments-link', arrowId: 'arrow-experiments' },
   ]) {
